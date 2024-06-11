@@ -9,9 +9,9 @@ class CreateUserView(APIView):
     def post(self, request):
         header = request.headers.get('x-Device')
         data = request.data
+        print(data)
         choose_serializer = HeaderFactory.serializer(header)
         serializer = choose_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=201)
-

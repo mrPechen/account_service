@@ -1,5 +1,6 @@
 import re
 
+from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer, DateField, CharField, EmailField
 
@@ -32,6 +33,7 @@ class MobileHeaderSerializer(ModelSerializer):
         pattern = re.compile(r'^7\d{10}$')
         if not pattern.match(value):
             raise ValidationError('Phone number must be in the format 7XXXXXXXXXX')
+        return value
 
     def create(self, validated_data):
         check_unique = Account.objects.filter(phone=validated_data.get('phone')).exists()
@@ -45,10 +47,10 @@ class WebHeaderSerializer(ModelSerializer):
     last_name = CharField(required=True)
     patronymic = CharField(required=True)
     phone = CharField(required=True)
-    birth_date = DateField(source='account.birth_date')
-    passport_number = CharField(source='account.passport_number')
-    place_of_birth = CharField(source='account.place_of_birth')
-    registration_address = CharField(source='account.registration_address')
+    birth_date = DateField(required=True)
+    passport_number = CharField(required=True)
+    place_of_birth = CharField(required=True)
+    registration_address = CharField(required=True)
 
     class Meta:
         model = Account
@@ -60,17 +62,20 @@ class WebHeaderSerializer(ModelSerializer):
         pattern = re.compile(r'^\d{4}\s\d{6}$')
         if not pattern.match(value):
             raise ValidationError('Passport number must be in the format XXXX XXXXXXX')
+        return value
 
     def validate_phone(self, value):
         pattern = re.compile(r'^7\d{10}$')
         if not pattern.match(value):
             raise ValidationError('Phone number must be in the format 7XXXXXXXXXX')
+        return value
 
     def create(self, validated_data):
-        check_unique = Account.objects.filter(phone=validated_data.get('phone')).exists()
-        if check_unique:
-            raise ValidationError("Phone already exists")
-        account_fields = ['first_name', 'last_name', 'patronymic', 'phone']
-        account_data = {field: validated_data.pop(field) for field in account_fields}
-        account = Account.objects.create(**account_data)
-        return User.objects.create(account=account, **validated_data['account'])
+        with transaction.atomic():
+            check_unique = Account.objects.filter(phone=validated_data.get('phone')).exists()
+            if check_unique:
+                raise ValidationError("Phone already exists")
+            account_fields = ['first_name', 'last_name', 'patronymic', 'phone']
+            account_data = {field: validated_data.pop(field) for field in account_fields}
+            account = Account.objects.create(**account_data)
+            return User.objects.create(account=account, **validated_data)

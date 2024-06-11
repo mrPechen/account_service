@@ -20,6 +20,7 @@ class Account(AbstractUser):
     def __str__(self):
         return str(self.id)
 
+
 class User(models.Model):
     class Meta:
         db_table = 'user'

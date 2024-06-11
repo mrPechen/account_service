@@ -1,4 +1,8 @@
 from django.http import JsonResponse
+from environs import Env
+
+
+
 
 
 class DeviceHeaderMiddleware:
@@ -7,7 +11,9 @@ class DeviceHeaderMiddleware:
 
     def __call__(self, request):
         if request.path == '/user/create/':
-            allowed_headers = ['mail', 'mobile', 'web']
+            env = Env()
+            env.read_env()
+            allowed_headers = env.list('ALLOWED_HEADERS', subcast=str)
             device_header = request.headers.get('x-Device')
 
             if device_header is None or device_header not in allowed_headers:
