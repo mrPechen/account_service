@@ -2,4 +2,3 @@ environs==9.5.0
 django==4.2.2
 djangorestframework==3.14.0
 psycopg2
-drf-yasg

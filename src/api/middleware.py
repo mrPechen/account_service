@@ -2,9 +2,6 @@ from django.http import JsonResponse
 from environs import Env
 
 
-
-
-
 class DeviceHeaderMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response

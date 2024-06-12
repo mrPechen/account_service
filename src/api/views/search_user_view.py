@@ -22,6 +22,7 @@ class SearchUserView(APIView):
                       'phone', 'email', 'birth_date', 'passport_number',
                       'place_of_birth', 'registration_address',
                       'residential_address']
+            ref_name = "OutputSerializer for search user"
 
     def get(self, request):
         query_params = request.query_params

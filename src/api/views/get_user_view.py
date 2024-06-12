@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, ReadOnlyField
 from rest_framework.views import APIView
 
-from api.models import User, Account
+from api.models import Account
 
 
 class GetUserView(APIView):
@@ -21,6 +21,7 @@ class GetUserView(APIView):
                       'phone', 'email', 'birth_date', 'passport_number',
                       'place_of_birth', 'registration_address',
                       'residential_address']
+            ref_name = "OutputSerializer for get user by id"
 
     def get(self, request, user_id: int):
         data = get_object_or_404(Account, id=user_id)
